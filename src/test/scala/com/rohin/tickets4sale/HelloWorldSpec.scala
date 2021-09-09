@@ -5,6 +5,7 @@ import com.rohin.tickets4sale.routes.Tickets4saleRoutes
 import org.http4s.*
 import org.http4s.implicits.*
 import munit.CatsEffectSuite
+import com.rohin.tickets4sale.resources._
 
 class HelloWorldSpec extends CatsEffectSuite {
 

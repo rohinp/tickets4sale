@@ -22,9 +22,13 @@ lazy val root = (project in file("."))
       "org.http4s"      %% "http4s-circe"        % Http4sVersion,
       "org.http4s"      %% "http4s-dsl"          % Http4sVersion,
       "io.circe"        %% "circe-generic"       % CirceVersion,
+      "io.circe"        %% "circe-parser"       % CirceVersion,
       "org.scalameta"   %% "munit"               % MunitVersion           % Test,
       "org.typelevel"   %% "munit-cats-effect-3" % MunitCatsEffectVersion % Test,
       "ch.qos.logback"  %  "logback-classic"     % LogbackVersion,
+      "de.svenkubiak"   %  "embedded-mongodb"    % "5.1.1",
+      "org.mongodb"     % "mongo-java-driver"    %"3.12.10",
+      "com.typesafe" % "config" % "1.4.1"
     ),
     testFrameworks += new TestFramework("munit.Framework")
   )

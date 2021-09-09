@@ -10,9 +10,19 @@ import org.http4s.ember.client.EmberClientBuilder
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.implicits._
 import org.http4s.server.middleware.Logger
+import de.svenkubiak.embeddedmongodb.EmbeddedMongoDB
+import com.typesafe.config.ConfigFactory
+import com.mongodb.MongoClient
+import scala.util.chaining._
+
+import InitScript._
+
 object Tickets4saleServer:
 
   def stream[F[_]: Async]: Stream[F, Nothing] = {
+    lazy val conf = ConfigFactory.load();
+    val mongoDB = initializeDB(conf)
+
     val httpApp = (
       Tickets4saleRoutes.indexRoutes(Index.impl[F]) <+>
         Tickets4saleRoutes.helloWorldRoutes(HelloWorld.impl[F])
