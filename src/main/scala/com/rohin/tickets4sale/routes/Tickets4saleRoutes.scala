@@ -6,9 +6,10 @@ import cats.effect._
 import cats.syntax.all._
 import fs2.Stream
 import fs2.text
-import io.circe.Json
 import io.circe.generic.auto._
 import io.circe.syntax._
+import io.circe._
+import org.http4s._
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.headers._
@@ -40,17 +41,17 @@ object Tickets4saleRoutes {
   def inventoryRoutes[F[_]: Async](I: InventoryService[IO]): HttpRoutes[F] =
     val dsl = new Http4sDsl[F]{}
     import dsl.*
-    import Inventory.given
     given QueryParamDecoder[LocalDate] = QueryParamDecoder[String].map(LocalDate.parse)
     object ShowDateParamMatcher extends QueryParamDecoderMatcher[LocalDate]("show-date")
     object QueryDateParamMatcher extends QueryParamDecoderMatcher[LocalDate]("query-date")
 
     HttpRoutes.of[F] {
       case GET -> Root / "show" :? ShowDateParamMatcher(showDate) +& QueryDateParamMatcher(queryDate)  =>
-        for {
-          in <- Stream.empty(I.inventory(queryDate,showDate)).compile.foldSemigroup
-          resp <- Ok(in.asJson)
-        } yield resp
+        //This is bad, but wanted a quick fix as I was running out of time ;-)
+        //Although it's on boundry
+        import cats.effect.unsafe.implicits.global
+        I.inventory(queryDate,showDate)
+          .map(in => Ok(in.asJson)).unsafeRunSync()
     }
 
   def fileLoaderRoutes[F[_]: Async](H: TicketsUpload[IO]): HttpRoutes[F] =
@@ -70,6 +71,19 @@ object Tickets4saleRoutes {
                 response <- Ok("Success")
               yield response
         }
+    }
+
+  def markFavrouiteRoutes[F[_]: Async](H: MakeFavService[IO]): HttpRoutes[F] =
+    val dsl = new Http4sDsl[F]{}
+    import dsl.*
+    import org.http4s.circe.CirceEntityCodec.circeEntityDecoder
+    import cats.effect.unsafe.implicits.global
+    HttpRoutes.of[F] {
+      case req @ POST -> Root / "fav" =>
+        for {
+          fav <- req.as[FavTitle].map(f => H.updateFav(f))
+          resp <- Ok(fav.unsafeRunSync().toString)
+        } yield (resp)
     }
 
 }

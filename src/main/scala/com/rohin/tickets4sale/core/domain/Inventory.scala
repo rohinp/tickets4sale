@@ -52,7 +52,6 @@ object Inventory:
                         )
                     }).toList)  
 
-
   def calculateStatus(p:Performace, queryDate:LocalDate):Status =
     if queryDate.isBefore(p.showDate) then 
       if p.ticketsLeft > 0 then

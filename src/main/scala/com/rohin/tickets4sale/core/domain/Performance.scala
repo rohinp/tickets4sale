@@ -20,6 +20,8 @@ enum Genre:
 
 case class Price(genre:Genre, price:BigDecimal)
 
+case class FavTitle(title:String, isFav:Boolean)
+
 trait DateEncDeco:
   given Decoder[LocalDate] = Decoder.decodeString.emapTry ( str => Try(LocalDate.parse(str)))
   given Encoder[LocalDate] = Encoder.instance(_.toString.asJson)
