@@ -5,7 +5,7 @@ import com.rohin.tickets4sale.routes.Tickets4saleRoutes
 import org.http4s.*
 import org.http4s.implicits.*
 import munit.CatsEffectSuite
-import com.rohin.tickets4sale.resources._
+import com.rohin.tickets4sale.services._
 
 class HelloWorldSpec extends CatsEffectSuite {
 
@@ -19,7 +19,7 @@ class HelloWorldSpec extends CatsEffectSuite {
 
   private[this] val retHelloWorld: IO[Response[IO]] = {
     val getHW = Request[IO](Method.GET, uri"/hello/world")
-    val helloWorld = HelloWorld.impl[IO]
-    Tickets4saleRoutes.helloWorldRoutes(helloWorld).orNotFound(getHW)
+    val helloWorld = InventoryService.impl[IO]
+    Tickets4saleRoutes.inventoryRoutes(helloWorld).orNotFound(getHW)
   }
 }

@@ -28,13 +28,25 @@ lazy val root = (project in file("."))
       "ch.qos.logback"  %  "logback-classic"     % LogbackVersion,
       "de.svenkubiak"   %  "embedded-mongodb"    % "5.1.1",
       "org.mongodb"     % "mongo-java-driver"    %"3.12.10",
-      "com.typesafe" % "config" % "1.4.1"
+      "com.typesafe"    % "config"               % "1.4.1",
+      "org.apache.commons" % "commons-csv"       % "1.9.0"
     ),
     testFrameworks += new TestFramework("munit.Framework")
   )
 
+scalacOptions ++= Seq(
+  "-encoding", "UTF-8",   // source files are in UTF-8
+  "-deprecation",         // warn about use of deprecated APIs
+  "-unchecked",           // warn about unchecked type parameters
+  "-feature",             // warn about misused language features
+  "-language:higherKinds",// allow higher kinded types without `import scala.language.higherKinds`
+  "-Yshow-suppressed-errors",
+  "-language:implicitConversions"
+)
+
 import scala.sys.process._
 lazy val initScript = taskKey[Unit]("Execute the init script.")
+lazy val buildUI    = taskKey[Unit]("Execute the npm build")
 
 initScript :=
   Using.Manager(op => {
@@ -43,4 +55,8 @@ initScript :=
     "npm run-script build" !
   }, _ => ())
 
+buildUI := {
+  "npm run-script build" !
+}
 addCommandAlias("runApp", ";initScript;run")
+addCommandAlias("buildAndRun", ";buildUI;run")

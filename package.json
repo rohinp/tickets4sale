@@ -6,6 +6,7 @@
     "build": "npm install ; webpack --mode production"
   },
   "dependencies": {
+    "axios": "^0.21.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },

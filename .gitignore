@@ -3,3 +3,7 @@ node_modules
 .metals
 project/target
 target
+.DS_Store
+.bsp
+.idea
+src/.DS_Store

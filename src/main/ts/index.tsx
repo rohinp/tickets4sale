@@ -2,7 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 const App = () => (
-  <h1>My React and TypeScript App!</h1>
+  <div>
+    <form action="/inventory" method="put" encType="multipart/form-data">
+      <input type="file" id="myFile" name="dateFile" />
+      <input type="submit" />
+    </form>
+  </div>
 );
 
 ReactDOM.render(

@@ -11,45 +11,29 @@ import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import scala.util.chaining._
 import org.log4s.getLogger
+import com.mongodb.client.MongoCollection
 
 object InitScript:
-
-  lazy val logger = getLogger
-
-  lazy val initMongo:EmbeddedMongoDB = 
-    //default port 29019 
+  //default port 29019 
+  lazy val embededMongo:EmbeddedMongoDB = 
     EmbeddedMongoDB.create().start()
 
-  def initMongoClient:EmbeddedMongoDB => MongoClient = 
+  def mongoClient:EmbeddedMongoDB => MongoClient = 
     mongo => new MongoClient(mongo.getHost(), mongo.getPort());
 
-  def initDB:Config => MongoClient => MongoDatabase = 
-    c => _.getDatabase(c.getString("tickets4Sale.db"))
+  def mongoDB(using c:Config):MongoClient => MongoDatabase = 
+    _.getDatabase(c.getString("tickets4Sale.db"))
 
-  def insertDefaults:Config => MongoDatabase => MongoDatabase =
-    config => mongo =>
-      val prices = mongo.getCollection(config.getString("tickets4Sale.tables.prices"))
-      prices.insertOne(Document.parse(Price(Genre.Musicals, 70).asJson.toString))
-      prices.insertOne(Document.parse(Price(Genre.Comedies, 50).asJson.toString))
-      prices.insertOne(Document.parse(Price(Genre.Dramas, 40).asJson.toString))
+  def initDB(using c:Config):MongoDatabase =
+    embededMongo
+      .pipe(mongoClient)
+      .pipe(mongoDB)
 
-      mongo
-
-  def testIfDataInserted:Config => MongoDatabase => MongoDatabase =
-    c => md => 
-      val table = md.getCollection(c.getString("tickets4Sale.tables.prices"))
-      import io.circe.parser.decode
-      table.find.forEach{
-        r => logger.info(decode[Price](r.toJson).toString)
-      }
-      md
-
-
-  def initializeDB:Config => MongoDatabase = c =>
-    initMongo
-          .pipe(initMongoClient)
-          .pipe(initDB(c))
-          .pipe(insertDefaults(c))
-          .pipe(testIfDataInserted(c))
+  def defaultPrices(using c:Config):Map[Genre, Int] =
+    Map(
+      Genre.MUSICAL -> c.getInt("tickets4Sale.default.prices.musicals"),
+      Genre.COMEDY -> c.getInt("tickets4Sale.default.prices.comedies"),
+      Genre.DRAMA -> c.getInt("tickets4Sale.default.prices.dramas")
+    )
 
 end InitScript
