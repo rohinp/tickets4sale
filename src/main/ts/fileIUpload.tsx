@@ -1,7 +1,6 @@
 import axios from 'axios';
-
 import React,{ChangeEventHandler,Component} from 'react';
-//React.ChangeEventHandler<HTMLInputElement>
+
 class FileUpload extends Component {
 
 	state = {
