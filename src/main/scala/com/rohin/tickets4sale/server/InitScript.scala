@@ -29,11 +29,4 @@ object InitScript:
       .pipe(mongoClient)
       .pipe(mongoDB)
 
-  def defaultPrices(using c:Config):Map[Genre, Int] =
-    Map(
-      Genre.MUSICAL -> c.getInt("tickets4Sale.default.prices.musicals"),
-      Genre.COMEDY -> c.getInt("tickets4Sale.default.prices.comedies"),
-      Genre.DRAMA -> c.getInt("tickets4Sale.default.prices.dramas")
-    )
-
 end InitScript

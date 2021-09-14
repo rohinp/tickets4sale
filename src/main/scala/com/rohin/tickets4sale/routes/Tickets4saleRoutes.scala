@@ -50,13 +50,13 @@ object Tickets4saleRoutes {
         //This is bad, but wanted a quick fix as I was running out of time ;-)
         //Although it's on boundry
         import cats.effect.unsafe.implicits.global
-        I.inventory(queryDate,showDate)
-          .map(in => Ok(in.asJson)).unsafeRunSync()
+        Ok(I.inventory(queryDate,showDate).map(_.asJson.noSpaces).unsafeRunSync())
     }
 
   def fileLoaderRoutes[F[_]: Async](H: TicketsUpload[IO]): HttpRoutes[F] =
     val dsl = new Http4sDsl[F]{}
     import dsl.*
+    import cats.effect.unsafe.implicits.global
     HttpRoutes.of[F] {
       case req @ PUT -> Root / "inventory" =>
         req.decode[Multipart[F]]{ m =>
@@ -64,11 +64,13 @@ object Tickets4saleRoutes {
             case None => 
               BadRequest(s"File not found.")
             case Some(part) => 
-              val records = part.body.through(text.utf8.decode)
-                .map(i => H.bulkUpload(CSVFormat.EXCEL.parse(new StringReader(i))))
+              val records = 
+                part.body.through(text.utf8.decode)
+                  .map(i => H.bulkUpload(CSVFormat.EXCEL.parse(new StringReader(i))))
               for 
                 contents <- records.compile.foldMonoid
-                response <- Ok("Success")
+                result = contents.unsafeRunSync()
+                response <- Ok(result.toString)
               yield response
         }
     }

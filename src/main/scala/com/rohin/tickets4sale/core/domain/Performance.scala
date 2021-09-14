@@ -18,8 +18,6 @@ enum Genre:
   case COMEDY
   case DRAMA
 
-case class Price(genre:Genre, price:BigDecimal)
-
 case class FavTitle(title:String, isFav:Boolean)
 
 trait DateEncDeco:
@@ -36,9 +34,10 @@ case class RawPerformace(
 
 object RawPerformace extends DateEncDeco:
   given Decoder[Genre] = Decoder.decodeString.emapTry(str => Try(Genre.valueOf(str)))
+  given Encoder[Genre] = Encoder.instance(_.toString.asJson)
 
   given Decoder[RawPerformace] = 
-    Decoder.forProduct3("genre", "title", "show_date")(RawPerformace.apply)
+    Decoder.forProduct3("genre", "title", "showDate")(RawPerformace.apply)
 
 case class Performace(
   _id:UUID,

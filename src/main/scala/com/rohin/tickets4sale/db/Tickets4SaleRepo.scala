@@ -23,6 +23,7 @@ import com.mongodb.client.model.InsertOneModel
 import com.mongodb.client.model.ReplaceOneModel
 import java.time.LocalDate
 import cats.effect.IO
+import org.log4s.getLogger
 
 trait Tickets4SaleRepo[F[_]]:
   def findPerformacesByTitle(title:String):F[List[Performace]]
@@ -50,7 +51,7 @@ class Tickets4SaleMongo(using c:Config, mongodb:MongoDatabase) extends Tickets4S
     }
 
   override def findPerformacesByDate(date:LocalDate):IO[List[Performace]] =
-    find(new Document("startDate", date.toString))
+    find(new Document("showDate", date.toString))
   
   override def findPerformacesByTitle(title:String):IO[List[Performace]] =
     find(new Document("title", title))
@@ -59,13 +60,13 @@ class Tickets4SaleMongo(using c:Config, mongodb:MongoDatabase) extends Tickets4S
     val javaList:java.util.List[com.mongodb.client.model.InsertOneModel[org.bson.Document]] = performaces.map(p => new InsertOneModel(Document.parse(p.asJson.noSpaces))).asJava
     IO(mongodb.getCollection(c.getString("tickets4Sale.collection.performances"))
       .bulkWrite(javaList)
-      .getInsertedCount)
+      .getInsertedCount) <* IO(getLogger.info(s"Records inserted ${performaces.length} with title ${performaces.headOption.map(d => (d.title, d.genre)).mkString}"))
 
   override def updatePerformaces(performaces:List[Performace]):IO[Int] = 
     val javaList:java.util.List[com.mongodb.client.model.ReplaceOneModel[org.bson.Document]] = 
       performaces.map(p => new ReplaceOneModel(new Document("_id", p._id), Document.parse(p.asJson.noSpaces))).asJava
     IO(mongodb.getCollection(c.getString("tickets4Sale.collection.performances"))
       .bulkWrite(javaList)
-      .getInsertedCount)
+      .getInsertedCount) <* IO(getLogger.info(s"Records updated ${performaces.length} with title ${performaces.headOption.map(d => (d.title, d.genre)).mkString}"))
 
 end Tickets4SaleMongo

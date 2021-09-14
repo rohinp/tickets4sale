@@ -24,7 +24,8 @@ case class Show(
 )
 
 case class SingleEntry(
-  genre:Genre,
+  genre:String,
+  price:Int,
   shows:List[Show]
 )
 
@@ -38,32 +39,27 @@ object Inventory:
   def toInventory(queryDate:LocalDate):List[Performace] => Inventory = 
     performaces => Inventory(performaces
                     .groupBy(_.genre)
-                    .map((genre, ps) => {
-                        SingleEntry(
-                          genre = genre,
-                          shows = ps.map(p => {
-                            Show(
-                                title = p.title,
-                                ticketsLeft = p.ticketsLeft,
-                                ticketsAvailable = p.ticketsAvailable,
-                                status = calculateStatus(p,queryDate).stringify
-                            )
-                          })
-                        )
-                    }).toList)  
+                    .map((genre, ps) => SingleEntry(
+                          genre = genre.toString,
+                          price = defaultPrices(genre),
+                          shows = ps.map(p => Show(p.title,p.ticketsLeft, p.ticketsAvailable, calculateStatus(p,queryDate).stringify))
+                        )).toList)  
 
   def calculateStatus(p:Performace, queryDate:LocalDate):Status =
     if queryDate.isBefore(p.showDate) then 
-      if p.ticketsLeft > 0 then
+      if p.ticketsLeft <= 0 then
         Status.SoldOut
       else
-        queryDate.plusDays(20).isBefore(p.showDate) match
+        p.showDate.isBefore(queryDate.plusDays(20)) match
           case true => Status.OpenForSale 
           case false => Status.SaleNotStarted
     else 
       Status.InThePast
 
-  given Semigroup[Inventory] = new Semigroup[Inventory]{
-    def combine(x: Inventory, y: Inventory): Inventory = Inventory(x.inventory ++ y.inventory)
-  }
+  def defaultPrices:Map[Genre, Int] =
+    Map(
+      Genre.MUSICAL -> 70,
+      Genre.COMEDY -> 50,
+      Genre.DRAMA -> 40
+    )
 end Inventory

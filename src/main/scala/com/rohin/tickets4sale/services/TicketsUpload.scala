@@ -30,8 +30,8 @@ object TicketsUpload:
     override def csvRecordToPerformance:CSVParser => IO[List[RawPerformace]] = 
       parser => 
         IO(parser.iterator.asScala.toList
-        .filter(r => r.get(0).nonEmpty && r.get(1).nonEmpty && r.get(2).nonEmpty)
-        .map(r => decode[RawPerformace](s"""{"genre": "${r.get(2)}", "title": "${r.get(0)}", "start_date": "${r.get(1)}"}"""))
+        .filter(_.size == 3)
+        .map(r => decode[RawPerformace](s"""{"genre": "${r.get(2)}", "title": "${r.get(0)}", "showDate": "${r.get(1)}"}"""))
         .pipe(ls => if ls.exists(_.isLeft) then throw RawPerformanceDecodeFailure(ls.filter(_.isLeft).mkString("\n")) else ls)
         .map(_.toOption.get))
 
