@@ -20,7 +20,8 @@ case class Show(
   title:String,
   ticketsLeft:Int,
   ticketsAvailable:Int,
-  status:String
+  status:String,
+  favrouite:Boolean
 )
 
 case class SingleEntry(
@@ -42,7 +43,12 @@ object Inventory:
                     .map((genre, ps) => SingleEntry(
                           genre = genre.toString,
                           price = defaultPrices(genre),
-                          shows = ps.map(p => Show(p.title,p.ticketsLeft, p.ticketsAvailable, calculateStatus(p,queryDate).stringify))
+                          shows = ps.map(p => Show(
+                            p.title,
+                            p.ticketsLeft, 
+                            p.ticketsAvailable, 
+                            calculateStatus(p,queryDate).stringify,
+                            p.favrouite))
                         )).toList)  
 
   def calculateStatus(p:Performace, queryDate:LocalDate):Status =

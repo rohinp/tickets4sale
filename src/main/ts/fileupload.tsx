@@ -4,15 +4,6 @@ import {NotificationContainer, NotificationManager} from 'react-notifications';
 
 class FileUpload extends Component {
 
-    /* private getFileFromInput(file: File): Promise<any> {
-        return new Promise(function (resolve, reject) {
-            const reader = new FileReader();
-            reader.onerror = reject;
-            reader.onload = function () { resolve(reader.result); };
-            reader.readAsBinaryString(file); // here the file can be read in different way Text, DataUrl, ArrayBuffer
-        });
-    } */
-
     private manageUploadedFile(file: File) {
         const formData = new FormData(); 
      
@@ -43,7 +34,6 @@ class FileUpload extends Component {
                 Uplod a csv file Record[title,yyyy-mm-dd,genre]<br />
                 <input accept=".csv" type="file" id="file" className="paper-btn" name="dateFile" onChange={e => this.handleFileChange(e)} />
                 <NotificationContainer/>
-                {/* <button className="paper-btn" onClick={e => e.stopPropagation()}>Upload File</button> */}
             </div>
         );
     }

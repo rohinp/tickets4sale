@@ -24,6 +24,7 @@ import collection.JavaConverters._
 import scala.concurrent.Future
 import cats.effect.IO
 import java.time.LocalDate
+import org.log4s.getLogger
 
 object Tickets4saleRoutes {
 

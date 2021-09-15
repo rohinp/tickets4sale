@@ -10,7 +10,6 @@ trait MakeFavService[F[_]]:
 object MakeFavService:
   def impl(ticketsRepo:Tickets4SaleRepo[IO]): MakeFavService[IO] = new MakeFavService[IO]{
     def updateFav(fav:FavTitle):IO[Int] = 
-      ticketsRepo.findPerformacesByTitle(fav.title)
-        .flatMap(ps => if ps.exists(_.favrouite != fav.isFav) then ticketsRepo.updatePerformaces(ps.map(_.copy(favrouite = fav.isFav))) else IO(0))
+      ticketsRepo.updatePerformaces(fav)
   }
 end MakeFavService

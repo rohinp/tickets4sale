@@ -30,7 +30,8 @@ object Tickets4saleServer:
     val httpApp = (
       Tickets4saleRoutes.indexRoutes(Index.impl[F]) <+>
         Tickets4saleRoutes.inventoryRoutes(InventoryService.impl(new Tickets4SaleMongo)) <+>
-        Tickets4saleRoutes.fileLoaderRoutes(TicketsUpload.impl(new Tickets4SaleMongo))
+        Tickets4saleRoutes.fileLoaderRoutes(TicketsUpload.impl(new Tickets4SaleMongo)) <+>
+        Tickets4saleRoutes.markFavrouiteRoutes(MakeFavService.impl(new Tickets4SaleMongo))
     ).orNotFound
 
     // With Middlewares in place
