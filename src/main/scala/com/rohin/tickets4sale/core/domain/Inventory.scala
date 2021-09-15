@@ -11,7 +11,7 @@ enum Status(value:String):
 
   def stringify:String =
     this match
-      case SaleNotStarted => "sale not stated"
+      case SaleNotStarted => "sale not started"
       case OpenForSale => "open for sale"
       case SoldOut => "sold out"
       case InThePast  => "in the past"
