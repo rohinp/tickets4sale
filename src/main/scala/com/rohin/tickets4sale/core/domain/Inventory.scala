@@ -3,6 +3,7 @@ package com.rohin.tickets4sale.core.domain
 import cats.kernel.Semigroup
 
 import java.time.LocalDate
+import io.circe.Decoder.state
 
 enum Status(value:String):
   case SaleNotStarted extends Status("sale not stated")
@@ -44,24 +45,31 @@ object Inventory:
                     .map((genre, ps) => SingleEntry(
                           genre = genre.toString,
                           price = defaultPrices(genre),
-                          shows = ps.map(p => Show(
-                            p.title,
-                            p.ticketsLeft, 
-                            p.ticketsAvailable, 
-                            calculateStatus(p,queryDate).stringify,
-                            p.favrouite))
+                          shows = ps.map(p => 
+                            val status = calculateStatus(p,queryDate)
+                            Show(
+                              p.title,
+                              p.ticketsLeft, 
+                              calculateTicketsAvailable(p)(status), 
+                              status.stringify,
+                              p.favrouite))
                         )).toList)  
 
   def calculateStatus(p:Performace, queryDate:LocalDate):Status =
     if queryDate.equals(p.showDate) || queryDate.isBefore(p.showDate) then 
-      if p.ticketsLeft <= 0 then
+      if p.ticketsLeft <= 0 || queryDate.isAfter(p.showDate.minusDays(6)) then
         Status.SoldOut
       else
-        p.showDate.isBefore(queryDate.plusDays(20)) match
+        p.showDate.isBefore(queryDate.plusDays(25)) match
           case true => Status.OpenForSale 
           case false => Status.SaleNotStarted
     else 
       Status.InThePast
+      
+  def calculateTicketsAvailable:Performace => Status => Int =
+    p => status => status match
+      case Status.OpenForSale => p.maxPurchase
+      case _ => 0
 
   def defaultPrices:Map[Genre, Int] =
     Map(

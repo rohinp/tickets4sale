@@ -24,7 +24,7 @@ class Tickets4SaleRepoSpec extends CatsEffectSuite {
 
   private[this] val fileUpload: IO[Int] = {
     val csv = getClass().getResource("/small.csv")
-    val salesMongo = new Tickets4SaleMongo
+    val salesMongo = new Tickets4SaleMongo[IO]
     TicketsUpload.impl(salesMongo).bulkUpload(CSVFormat.EXCEL.parse(new FileReader(csv.getPath)))
   }
 

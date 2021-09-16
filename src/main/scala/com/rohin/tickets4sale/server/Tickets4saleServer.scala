@@ -26,24 +26,32 @@ object Tickets4saleServer:
   def stream[F[_]: Async]: Stream[F, Nothing] = {
     given Config = ConfigFactory.load()
     given MongoDatabase = initDB
+    val ticketsMongoRepo = new Tickets4SaleMongo
 
     val httpApp = (
       Tickets4saleRoutes.indexRoutes(Index.impl[F]) <+>
-        Tickets4saleRoutes.inventoryRoutes(InventoryService.impl[F](new Tickets4SaleMongo)) <+>
-        Tickets4saleRoutes.fileLoaderRoutes(TicketsUpload.impl[F](new Tickets4SaleMongo)) <+>
-        Tickets4saleRoutes.markFavrouiteRoutes(MakeFavService.impl[F](new Tickets4SaleMongo))
+        Tickets4saleRoutes.inventoryRoutes(
+          InventoryService.impl[F](ticketsMongoRepo)
+        ) <+>
+        Tickets4saleRoutes.fileLoaderRoutes(
+          TicketsUpload.impl[F](ticketsMongoRepo)
+        ) <+>
+        Tickets4saleRoutes.markFavrouiteRoutes(
+          MakeFavService.impl[F](ticketsMongoRepo)
+        )
     ).orNotFound
 
     // With Middlewares in place
     val finalHttpApp = Logger.httpApp(true, false)(httpApp)
     for
       exitCode <- Stream.resource(
-        EmberServerBuilder.default[F]
+        EmberServerBuilder
+          .default[F]
           .withHost(ipv4"0.0.0.0")
           .withPort(port"8080")
           .withHttpApp(finalHttpApp)
           .build >>
-        Resource.eval(Async[F].never)
+          Resource.eval(Async[F].never)
       )
     yield exitCode
   }.drain
