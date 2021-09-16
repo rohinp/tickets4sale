@@ -5,10 +5,8 @@
 2.  [Tech stack](#tech-stack)
 3.  [Domain Objects](#domain-objects)
 4.  [Business Logic](#business-logic)
-5.  [Error handling](#error-handling)
-6.  [Future Improvements](#future-improvements)
-7.  [How to run](#hot-to-run)
-8.  [System Requiremnts](#system-requirements)
+5.  [Future Improvements](#future-improvements)
+6.  [How to run](#hot-to-run)
 
 
 
@@ -69,40 +67,44 @@ FileUpload, Display inventory, and the index page are the only components.
 
 ### Business Logic
 
-Business logic is scatered in the domain and the service implementations. And most of it is tested using the MUnit.
+Business logic is scatered in the domain and the service implementations. And most of it is tested using the MUnit. Tests will be sufficient enough to explain the logic implemented.
 
-### Error handling
-```
-
-
-
-
-
-```
 
 ### Future Improvements
-```
+> There is lot to improve.
 
+1. Client side written in typeScript (this was my first time) would have been well modeled and lot of effects can be manages in a better way. I mean more FP, but unfortunately I didnt had enough time to learn and make the code better.
 
+2. Error handling can be improved a lot, though the server side error are automatically managed by custom errors and Effects but on client side it coukd have been better.
 
+3. Modeling on server side would have been much better by using scala 3 enums rathar than creating independent case classes at some places.
 
+4. Missing tests from client side completely due to shortage of time. Although server side tests and also not complete though those are enough to test the business.
 
-```
 
 ### How to run
+
+Make sure you have latest version of sbt and node for starters.
+
+to run the Application just do
+```
+sbt runApp
 ```
 
-
-
-
-
+In case there is a UI change, no need to restart server side application just do 
+```
+npm run-script dbuild 
 ```
 
-### System Requirements
+If you want to build/install the UI and serverside both together and start the application do
+```
+sbt buildAndRun
 ```
 
+Note: The sbt custome tasks take care of running/compiling both server and client side.
 
-
-
-
+Last for running tests
 ```
+sbt test
+```
+
