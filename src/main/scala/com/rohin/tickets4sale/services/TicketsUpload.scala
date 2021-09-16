@@ -14,12 +14,13 @@ import scala.util.chaining._
 
 import collection.JavaConverters._
 
-trait TicketsUpload[F[_]]:
+trait TicketsUpload[F[_] :Monad]:
   type Performances = List[Performace]
   def csvRecordToPerformance:CSVParser => F[List[RawPerformace]]
   def generatePerformanceRecords:List[RawPerformace] => F[List[Performances]]
   def storePerformance:List[Performances] => F[Int]
-  def bulkUpload:CSVParser => F[Int]
+  def bulkUpload:CSVParser => F[Int] =
+    p => csvRecordToPerformance(p) flatMap generatePerformanceRecords flatMap storePerformance
 
 object TicketsUpload:
   import RawPerformace.given
@@ -40,12 +41,10 @@ object TicketsUpload:
           for 
             rp <- rps
           yield Performace.generatePerformaces(100)(rp)).pure[F]
+          
     override def storePerformance:List[Performances] => F[Int] = 
       pfs =>
         pfs.traverse(ticketsRepo.insertPerformances)
           .map(_.sum)
-
-    override def bulkUpload:CSVParser => F[Int] =
-      p => csvRecordToPerformance(p) flatMap generatePerformanceRecords flatMap storePerformance
   }
 end TicketsUpload

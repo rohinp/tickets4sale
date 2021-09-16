@@ -121,12 +121,14 @@ class Inventory extends Component<unknown, InventoryState> {
 
     private checkFav(event:ChangeEvent<HTMLInputElement>, item:string) {
         const url = "http://localhost:8080/fav"
-        axios.post(url, {title: item, isFav: event.target.value == "on"},{
+        const target = event.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        axios.post(url, {title: item, isFav: value},{
             headers: {'content-type': 'application/json'}
           }).then(
             d => {
                 this.inventory(this.state.showDate, this.state.queryDate)
-                console.log("Docs updates " + d)
+                console.log("Docs updates " + d.data)
             },
             err => console.log(err)
         );
