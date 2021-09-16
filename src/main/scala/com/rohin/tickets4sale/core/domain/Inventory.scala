@@ -1,7 +1,8 @@
 package com.rohin.tickets4sale.core.domain
 
-import java.time.LocalDate
 import cats.kernel.Semigroup
+
+import java.time.LocalDate
 
 enum Status(value:String):
   case SaleNotStarted extends Status("sale not stated")
@@ -52,7 +53,7 @@ object Inventory:
                         )).toList)  
 
   def calculateStatus(p:Performace, queryDate:LocalDate):Status =
-    if queryDate.isBefore(p.showDate) then 
+    if queryDate.equals(p.showDate) || queryDate.isBefore(p.showDate) then 
       if p.ticketsLeft <= 0 then
         Status.SoldOut
       else

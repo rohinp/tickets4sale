@@ -2,6 +2,7 @@ package com.rohin.tickets4sale.services
 
 import cats.Applicative
 import cats.implicits.*
+
 import scala.util.Using.*
 
 trait Index[F[_]]:

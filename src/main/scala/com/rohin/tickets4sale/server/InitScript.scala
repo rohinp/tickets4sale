@@ -1,17 +1,16 @@
 package com.rohin.tickets4sale.server
 
-import de.svenkubiak.embeddedmongodb.EmbeddedMongoDB
 import com.mongodb.MongoClient
-import com.mongodb.client.MongoDatabase
+import com.mongodb.client._
 import com.rohin.tickets4sale.core.domain._
+import com.typesafe.config._
+import de.svenkubiak.embeddedmongodb.EmbeddedMongoDB
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.bson.Document
-import com.typesafe.config.Config
-import com.typesafe.config.ConfigFactory
-import scala.util.chaining._
 import org.log4s.getLogger
-import com.mongodb.client.MongoCollection
+
+import scala.util.chaining._
 
 object InitScript:
   //default port 29019 

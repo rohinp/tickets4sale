@@ -1,18 +1,20 @@
 package com.rohin.tickets4sale.core.domain
 
 
-import scala.util.chaining._
 import cats.instances.uuid
-import java.util.UUID
-import io.circe.Decoder
-import io.circe.HCursor
-import io.circe.Encoder
-import io.circe.syntax._
-import scala.util.Try
-import java.text.SimpleDateFormat
-import java.text.DateFormat
-import java.time.LocalDate
 import cats.syntax.apply._
+import io.circe.Decoder
+import io.circe.Encoder
+import io.circe.HCursor
+import io.circe.syntax._
+
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.UUID
+import scala.util.Try
+import scala.util.chaining._
+
 enum Genre:
   case MUSICAL
   case COMEDY
