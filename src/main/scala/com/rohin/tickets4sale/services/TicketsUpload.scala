@@ -13,19 +13,24 @@ import org.apache.commons.csv._
 import scala.util.chaining._
 
 import collection.JavaConverters._
+import java.time.LocalDate
 
 trait TicketsUpload[F[_] :Monad]:
   type Performances = List[Performace]
   def csvRecordToPerformance:CSVParser => F[List[RawPerformace]]
   def generatePerformanceRecords:List[RawPerformace] => F[List[Performances]]
   def storePerformance:List[Performances] => F[Int]
+  def filterAlreadyExists:List[RawPerformace] => F[List[RawPerformace]]
   def bulkUpload:CSVParser => F[Int] =
-    p => csvRecordToPerformance(p) flatMap generatePerformanceRecords flatMap storePerformance
+    p => csvRecordToPerformance(p) flatMap 
+          filterAlreadyExists flatMap 
+          generatePerformanceRecords flatMap 
+          storePerformance
 
 object TicketsUpload:
   import RawPerformace.given
 
-  def impl[F[_]:Monad](ticketsRepo:Tickets4SaleRepo[F]): TicketsUpload[F] = new TicketsUpload[F]{
+  def impl[F[_]:Monad](using ticketsRepo:Tickets4SaleRepo[F]): TicketsUpload[F] = new TicketsUpload[F]{
     
     override def csvRecordToPerformance:CSVParser => F[List[RawPerformace]] = 
       parser => 
@@ -43,8 +48,13 @@ object TicketsUpload:
           yield Performace.generatePerformaces(100)(rp)).pure[F]
           
     override def storePerformance:List[Performances] => F[Int] = 
-      pfs =>
-        pfs.traverse(ticketsRepo.insertPerformances)
+      _.traverse(ticketsRepo.insertPerformances)
           .map(_.sum)
+
+    override def filterAlreadyExists:List[RawPerformace] => F[List[RawPerformace]] =
+      _.traverseFilter(rp => 
+          ticketsRepo.findPerformacesByDate(rp.showDate)
+            .map(ps => if ps.exists(_.title == rp.title) then None else Some(rp)))
+          
   }
 end TicketsUpload

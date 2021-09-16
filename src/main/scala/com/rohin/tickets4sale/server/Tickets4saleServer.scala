@@ -16,7 +16,7 @@ import org.http4s.ember.client.EmberClientBuilder
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.implicits._
 import org.http4s.server.middleware.Logger
-
+import Tickets4saleRoutes._
 import scala.util.chaining._
 
 import InitScript._
@@ -26,19 +26,13 @@ object Tickets4saleServer:
   def stream[F[_]: Async]: Stream[F, Nothing] = {
     given Config = ConfigFactory.load()
     given MongoDatabase = initDB
-    val ticketsMongoRepo = new Tickets4SaleMongo
+    given Tickets4SaleMongo[F] = new Tickets4SaleMongo[F]
 
     val httpApp = (
-      Tickets4saleRoutes.indexRoutes(Index.impl[F]) <+>
-        Tickets4saleRoutes.inventoryRoutes(
-          InventoryService.impl[F](ticketsMongoRepo)
-        ) <+>
-        Tickets4saleRoutes.fileLoaderRoutes(
-          TicketsUpload.impl[F](ticketsMongoRepo)
-        ) <+>
-        Tickets4saleRoutes.markFavrouiteRoutes(
-          MakeFavService.impl[F](ticketsMongoRepo)
-        )
+      indexRoutes(Index.impl[F]) <+>
+      inventoryRoutes(InventoryService.impl[F]) <+>
+      fileLoaderRoutes(TicketsUpload.impl[F]) <+>
+      markFavrouiteRoutes(MakeFavService.impl[F])
     ).orNotFound
 
     // With Middlewares in place

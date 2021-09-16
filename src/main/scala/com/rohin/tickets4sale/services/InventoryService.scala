@@ -16,7 +16,7 @@ trait InventoryService[F[_]]{
 }
 
 object InventoryService {
-  def impl[F[_]:Applicative](ticketsRepo:Tickets4SaleRepo[F]): InventoryService[F] = new InventoryService[F]{
+  def impl[F[_]:Applicative](using ticketsRepo:Tickets4SaleRepo[F]): InventoryService[F] = new InventoryService[F]{
     def inventory(queryDate:LocalDate, showDate:LocalDate): F[Inventory] = 
       ticketsRepo.findPerformacesByDate(showDate)
         .map(Inventory.toInventory(queryDate))

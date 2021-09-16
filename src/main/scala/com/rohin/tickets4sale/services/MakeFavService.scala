@@ -8,7 +8,7 @@ trait MakeFavService[F[_]]:
   def updateFav(fav:FavTitle):F[Int]
 
 object MakeFavService:
-  def impl[F[_]](ticketsRepo:Tickets4SaleRepo[F]): MakeFavService[F] = new MakeFavService[F]{
+  def impl[F[_]](using ticketsRepo:Tickets4SaleRepo[F]): MakeFavService[F] = new MakeFavService[F]{
     def updateFav(fav:FavTitle):F[Int] = 
       ticketsRepo.updatePerformaces(fav)
   }
