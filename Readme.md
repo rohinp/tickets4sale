@@ -96,6 +96,17 @@ Few design decissions and details.
 
 5. Gracefull shutdown of a stream is always a problem and it can be seen here as well when you try to shutdown the application. Could have been handled in a better way.
 
+6. Optional but instead of trait and impl for services, could have created service as indepedent functions and used something like this(Context types) as function type signature to inject dependencies.
+    ```
+    type ReaderWithConfig = Conf ?=> RecordReader //or
+    type ReaderWithConfig = Mongo ?=> RecordReader //or, depend on situation
+    //could have given more control on how we compose programs in scala 3
+    ```
+
+7. As a clean up activity, could have given a button to clear up tickets which are 100 + days old. Or may be if used databases support ttl would have used those.
+
+8. I didnt had enough time to look in to the bonus case :-), but was tempted to implement it.
+
 ### How to run
 
 Make sure you have latest version of sbt and node for starters.
