@@ -22,6 +22,7 @@ import concurrent.ExecutionContext.Implicits.global
 class FileUpoadSpec extends CatsEffectSuite with Http4sClientDsl[IO] {
   given c:Config = ConfigFactory.load()
   given md:MongoDatabase = InitScript.initDB
+  given Tickets4SaleMongo[IO] = new Tickets4SaleMongo[IO]
 
   test("File Upload returns status code 200 and data is uploaded in Mongo") {
     assertIO(fileUpload.map(_.status) ,Status.Ok)
@@ -43,8 +44,8 @@ class FileUpoadSpec extends CatsEffectSuite with Http4sClientDsl[IO] {
       headers = multipart.headers,
       body = EntityEncoder[IO, Multipart[IO]].toEntity(multipart).body
     )
-    val helloWorld = TicketsUpload.impl(new Tickets4SaleMongo)
-    Tickets4saleRoutes.fileLoaderRoutes(helloWorld).orNotFound(putfileUpoad)
+    val tu = TicketsUpload.impl
+    Tickets4saleRoutes.fileLoaderRoutes(tu).orNotFound(putfileUpoad)
   }
 
 }

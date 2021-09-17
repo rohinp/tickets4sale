@@ -13,19 +13,24 @@ import com.rohin.tickets4sale.server.InitScript
 import com.rohin.tickets4sale.db.Tickets4SaleMongo
 import java.io.FileReader
 import org.apache.commons.csv.CSVFormat
+import scala.util.chaining._
 
 class Tickets4SaleRepoSpec extends CatsEffectSuite {
   given c:Config = ConfigFactory.load()
   given md:MongoDatabase = InitScript.initDB
-
+  given Tickets4SaleMongo[IO] = new Tickets4SaleMongo[IO]
   test("Insert records in mongo from file") {
-    assertIO(fileUpload ,300)
+    /* As mongoDb is not shutting down gracefully need to drop to make sure it's clean slate */
+    for 
+      _ <- IO(md.getCollection("performances").drop())
+      _ <- assertIO(fileUpload ,300).map(_.tap(_ => InitScript.embededMongo.stop()))
+    yield ()
   }
 
   private[this] val fileUpload: IO[Int] = {
     val csv = getClass().getResource("/small.csv")
     val salesMongo = new Tickets4SaleMongo[IO]
-    TicketsUpload.impl(salesMongo).bulkUpload(CSVFormat.EXCEL.parse(new FileReader(csv.getPath)))
+    TicketsUpload.impl.bulkUpload(CSVFormat.EXCEL.parse(new FileReader(csv.getPath)))
   }
 
 }
