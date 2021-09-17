@@ -105,7 +105,7 @@ If you want to build/install the UI and serverside both together and start the a
 sbt buildAndRun
 ```
 
-to run the Application just do
+If the UI is already build then you can just run the  Application with
 ```
 sbt runApp
 ```
@@ -117,8 +117,9 @@ npm run-script dbuild
 
 
 Note: 
-The sbt custome tasks take care of running/compiling both server and client side.
-To make the application easy to use, the UI has an extra (optional) date field to select query date so that user dont need to go post man or browser window to get and view the data. Also there is an upload file button which can be used to upload data to application.
+1. Reccomend to run the first command, if the application has never build and run ou your machine.
+2. The sbt custome tasks take care of running/compiling both server and client side.
+3. To make the application easy to use, the UI has an extra (optional) date field to select query date so that user dont need to go post man or browser window to get and view the data. Also there is an upload file button which can be used to upload data to application.
 
 Last for running tests
 ```
