@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { Component, ChangeEvent } from 'react';
-import {NotificationContainer, NotificationManager} from 'react-notifications';
+import {NotificationManager} from 'react-notifications';
 
 class FileUpload extends Component {
 
@@ -13,8 +13,8 @@ class FileUpload extends Component {
             file.name
         ); 
         axios.put("http://localhost:8080/inventory",formData).then(
-            _ => NotificationManager.success('Success', 'Upload File'),
-            err => NotificationManager.error('Error', 'Click me!', 5000, () => {
+            () => NotificationManager.success('', 'Upload Success...'),
+            err => NotificationManager.error('Error', 'Click me!', 2000, () => {
                 alert(err);
               })
         );
@@ -28,12 +28,11 @@ class FileUpload extends Component {
         }
     }
 
-    render() {
+    render():JSX.Element {
         return (
             <div className="paper container">
                 Uplod a csv file Record[title,yyyy-mm-dd,genre]<br />
                 <input accept=".csv" type="file" id="file" className="paper-btn" name="dateFile" onChange={e => this.handleFileChange(e)} />
-                <NotificationContainer/>
             </div>
         );
     }

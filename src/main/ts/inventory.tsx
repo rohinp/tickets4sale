@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { date, string } from 'fp-ts';
 import React, { Component, ChangeEvent } from 'react';
+import {NotificationManager} from 'react-notifications';
 
 interface InventoryState {
     showDate: Date;
@@ -105,17 +105,23 @@ class Inventory extends Component<unknown, InventoryState> {
         axios.get(url).then(
             d => {
                 try {
-                    console.log(d.data)
+                    NotificationManager.success('', 'Reload Success...')
                     const i: Inventories = d.data
-                    console.log(i)
                     this.setState({
                         inventories: i
                     })
                 } catch (error) {
+                    NotificationManager.error('Error', 'Click me!', 2000, () => {
+                        alert(error);
+                    })
                     console.log(error)
                 }
             },
-            err => console.log(err)
+            err => {
+                NotificationManager.error('Error', 'Click me!', 2000, () => {
+                    alert(err);
+                })
+            }
         );
     }
 
@@ -126,9 +132,8 @@ class Inventory extends Component<unknown, InventoryState> {
         axios.post(url, {title: item, isFav: value},{
             headers: {'content-type': 'application/json'}
           }).then(
-            d => {
+            () => {
                 this.inventory(this.state.showDate, this.state.queryDate)
-                console.log("Docs updates " + d.data)
             },
             err => console.log(err)
         );
@@ -138,7 +143,7 @@ class Inventory extends Component<unknown, InventoryState> {
         this.inventory(this.state.showDate, this.state.queryDate)
     }
 
-    render() {
+    render():JSX.Element {
         return (
             <div>
                 <div className="row paper container flex-center" >
@@ -162,7 +167,7 @@ class Inventory extends Component<unknown, InventoryState> {
                     </div>
                     <div className="sm-4 col">
                         <br />
-                        <button onClick={e => this.handleDateChange()}>Load Data</button>
+                        <button onClick={() => this.handleDateChange()}>Load Data</button>
                     </div>
 
                 </div>

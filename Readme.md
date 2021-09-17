@@ -77,7 +77,11 @@ Few design decissions and details.
 
 3. `InventoryService` is prety straight forward to understands as it only does a find and converts the `Performace` records into `Inventory` objects to be send to UI/front end.
 
-2. Apart from this it's a bundeled scala and typescript repo and both the developments and testing can be done together.
+4. To make the application easy to use, the UI has an extra (optional) date field to select query date so that user dont need to go post man or browser window to get and view the data. Also there is an upload file button which can be used to upload data to application.
+
+5. Apart from this it's a bundeled scala and typescript repo and both the developments and testing can be done together.
+
+
 
 ### Future Improvements
 > There is lot to improve.
@@ -96,6 +100,11 @@ Few design decissions and details.
 
 Make sure you have latest version of sbt and node for starters.
 
+If you want to build/install the UI and serverside both together and start the application do
+```
+sbt buildAndRun
+```
+
 to run the Application just do
 ```
 sbt runApp
@@ -106,12 +115,10 @@ In case there is a UI change, no need to restart server side application just do
 npm run-script dbuild 
 ```
 
-If you want to build/install the UI and serverside both together and start the application do
-```
-sbt buildAndRun
-```
 
-Note: The sbt custome tasks take care of running/compiling both server and client side.
+Note: 
+The sbt custome tasks take care of running/compiling both server and client side.
+To make the application easy to use, the UI has an extra (optional) date field to select query date so that user dont need to go post man or browser window to get and view the data. Also there is an upload file button which can be used to upload data to application.
 
 Last for running tests
 ```
