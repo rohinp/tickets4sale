@@ -18,7 +18,7 @@ import com.mongodb.client.MongoDatabase
 import com.rohin.tickets4sale.server.InitScript
 import com.rohin.tickets4sale.db.Tickets4SaleMongo
 import concurrent.ExecutionContext.Implicits.global
-
+import scala.concurrent.duration._
 class FileUpoadSpec extends CatsEffectSuite with Http4sClientDsl[IO] {
   given c:Config = ConfigFactory.load()
   given md:MongoDatabase = InitScript.initDB
@@ -28,6 +28,7 @@ class FileUpoadSpec extends CatsEffectSuite with Http4sClientDsl[IO] {
     for 
       _ <- IO(md.getCollection("performances").drop())
       _ <- assertIO(fileUpload.map(_.status) ,Status.Ok)
+      _ <- IO.sleep(5.seconds)
       _ <- IO(InitScript.embededMongo.stop())
     yield ()
     
