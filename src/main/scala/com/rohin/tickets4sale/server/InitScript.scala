@@ -16,7 +16,9 @@ import com.mongodb.BasicDBObject
 object InitScript:
   //default port 29019 
   lazy val embededMongo:EmbeddedMongoDB = 
-    EmbeddedMongoDB.create().start()
+    if EmbeddedMongoDB.create().isActive then 
+      EmbeddedMongoDB.create()
+    else EmbeddedMongoDB.create().start()
 
   def mongoClient:EmbeddedMongoDB => MongoClient = 
     mongo => new MongoClient(mongo.getHost(), mongo.getPort());

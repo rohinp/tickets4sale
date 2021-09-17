@@ -23,7 +23,8 @@ class Tickets4SaleRepoSpec extends CatsEffectSuite {
     /* As mongoDb is not shutting down gracefully need to drop to make sure it's clean slate */
     for 
       _ <- IO(md.getCollection("performances").drop())
-      _ <- assertIO(fileUpload ,300).map(_.tap(_ => InitScript.embededMongo.stop()))
+      _ <- assertIO(fileUpload ,300)
+      _ <- IO(InitScript.embededMongo.stop())
     yield ()
   }
 
