@@ -111,7 +111,9 @@ Few design decissions and details.
 
 Make sure you have latest version of java(11+), sbt and node for starters.
 
-If you want to build/install the UI and serverside both together and start the application do
+If you want to build/install the UI and serverside both together and start the application do.
+(Imp: You might see mongo hickups to start on console but it'll eventually pick a port and start.
+After below instruction is success, open your browser and try http://localhost:8080)
 ```
 sbt buildAndRun
 ```
