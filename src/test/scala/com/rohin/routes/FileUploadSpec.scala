@@ -25,7 +25,12 @@ class FileUpoadSpec extends CatsEffectSuite with Http4sClientDsl[IO] {
   given Tickets4SaleMongo[IO] = new Tickets4SaleMongo[IO]
 
   test("File Upload returns status code 200 and data is uploaded in Mongo") {
-    assertIO(fileUpload.map(_.status) ,Status.Ok)
+    for 
+      _ <- IO(md.getCollection("performances").drop())
+      _ <- assertIO(fileUpload.map(_.status) ,Status.Ok)
+      _ <- IO(InitScript.embededMongo.stop())
+    yield ()
+    
   }
 
   private[this] val fileUpload: IO[Response[IO]] = {
