@@ -109,7 +109,7 @@ Few design decissions and details.
 
 ### How to run
 
-Make sure you have latest version of sbt and node for starters.
+Make sure you have latest version of java(11+), sbt and node for starters.
 
 If you want to build/install the UI and serverside both together and start the application do
 ```
