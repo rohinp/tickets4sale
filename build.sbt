@@ -15,7 +15,7 @@ lazy val root = (project in file("."))
     organization := "com.rohin",
     name := "tickets4sale",
     version := "0.0.1-SNAPSHOT",
-    scalaVersion := "3.0.1",
+    scalaVersion := "3.1.1",
     libraryDependencies ++= Seq(
       "org.http4s"      %% "http4s-ember-server" % Http4sVersion,
       "org.http4s"      %% "http4s-ember-client" % Http4sVersion,

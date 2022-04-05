@@ -8,3 +8,6 @@ target
 .idea
 src/.DS_Store
 .vscode
+.history
+project/metals.sbt
+project/project

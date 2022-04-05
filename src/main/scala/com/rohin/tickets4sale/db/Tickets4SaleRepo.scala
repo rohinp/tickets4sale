@@ -26,6 +26,8 @@ import scala.util.chaining._
 
 import Performace.given
 import Performace._
+import cats.effect.kernel.Async
+import scala.util.Try
 
 trait Tickets4SaleRepo[F[_]]:
   def findPerformacesByTitle(title: String): F[List[Performace]]
@@ -33,23 +35,26 @@ trait Tickets4SaleRepo[F[_]]:
   def insertPerformances(performaces: List[Performace]): F[Int]
   def updatePerformaces(fav: FavTitle): F[Int]
 
-class Tickets4SaleMongo[F[_]:Applicative](using c: Config, mongodb: MongoDatabase)
+class Tickets4SaleMongo[F[_]: Async](using c: Config, mongodb: MongoDatabase)
     extends Tickets4SaleRepo[F]:
-  def find(query: Document): F[List[Performace]] =
-      def loop(cursor: MongoCursor[Document]): List[Performace] =
-        if cursor.hasNext then
-          decode[Performace](cursor.next.toJson)
-            .fold(
-              e => throw PerformanceDecodeFailure(e.getMessage),
-              v => v :: loop(cursor)
-            )
-        else List()
 
+  def find(query: Document): F[List[Performace]] =
+    def loop(cursor: MongoCursor[Document]): List[Performace] =
+      if cursor.hasNext then
+        decode[Performace](cursor.next.toJson)
+          .fold(
+            e => throw PerformanceDecodeFailure(e.getMessage),
+            v => v :: loop(cursor)
+          )
+      else List()
+
+    Async[F].delay(
       mongodb
         .getCollection(c.getString("tickets4Sale.collection.performances"))
         .find(query)
         .iterator
-        .pipe(loop).pure[F]
+        .pipe(loop)
+    )
 
   override def findPerformacesByDate(date: LocalDate): F[List[Performace]] =
     find(new Document("showDate", date.toString))
@@ -58,34 +63,36 @@ class Tickets4SaleMongo[F[_]:Applicative](using c: Config, mongodb: MongoDatabas
     find(new Document("title", title))
 
   override def insertPerformances(performaces: List[Performace]): F[Int] =
+    
     val javaList: java.util.List[
       com.mongodb.client.model.InsertOneModel[org.bson.Document]
     ] = performaces
       .map(p => new InsertOneModel(Document.parse(p.asJson.noSpaces)))
       .asJava
-    mongodb
-        .getCollection(c.getString("tickets4Sale.collection.performances"))
-        .bulkWrite(javaList)
-        .getInsertedCount.pure[F]
-     <* 
-      getLogger.info(
-        s"Records inserted ${performaces.length} with title ${performaces.headOption
-          .map(d => (d.title, d.genre))
-          .mkString}").pure[F]
+
+    Async[F].delay(mongodb
+      .getCollection(c.getString("tickets4Sale.collection.performances"))
+      .bulkWrite(javaList)
+      .getInsertedCount)
+    <*
+    Async[F].delay(getLogger
+      .info(s"Records inserted ${performaces.length} with title ${performaces.headOption
+        .map(d => (d.title, d.genre))
+        .mkString}"))
 
   override def updatePerformaces(fav: FavTitle): F[Int] =
-      mongodb
-        .getCollection(c.getString("tickets4Sale.collection.performances"))
-        .updateMany(
-          new Document("title", fav.title),
-          Updates.set("favrouite", fav.isFav)
-        )
-        .getModifiedCount
-        .toInt.pure[F]
-     <*
-      getLogger.info(
+    Async[F].delay(mongodb
+      .getCollection(c.getString("tickets4Sale.collection.performances"))
+      .updateMany(
+        new Document("title", fav.title),
+        Updates.set("favrouite", fav.isFav)
+      )
+      .getModifiedCount
+      .toInt)
+    <*
+    Async[F].delay(getLogger
+      .info(
         s"Updating ${fav.title} with fav value ${fav.isFav}"
-      ).pure[F]
-    
+      ))
 
 end Tickets4SaleMongo
